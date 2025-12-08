@@ -46,14 +46,27 @@ string maiusculo(string texto) {
 
 
 int main() {
-    cout << "Diretorio atual: " << std::filesystem::current_path() << endl;
-
-    cout << "DIGITE 1 PARA TEMA CLARO E 2 PARA TEMA ESCURO: ";
-    int tema;
-    cin >> tema;
-    if(tema==1){
-        system("color f0");
-        system ("cls");
+    //cout << "Diretorio atual: " << std::filesystem::current_path() << endl;
+    system("color a");
+    int tema = 0;
+    while(tema!=1 and tema!=2){
+    
+        cout << "DIGITE 1 PARA TEMA ESCURO E 2 PARA TEMA CLARO: "; 
+        cin >> tema;
+        if(cin.fail()){
+            cin.clear();
+            cin.ignore(200, '\n');
+            tema = 0; 
+             cout << "Opcao invalida, selecione:" << endl << "1 -> TEMA ESCURO" << endl << "2 -> TEMA CLARO" << endl;
+            continue;
+        }
+        if(tema==2){
+            system("color f0");
+            system ("cls");
+        }
+        else if(tema!=1 and tema!=2){
+            cout << "OPCAO INVALIDA TENTE NOVAMENTE" << endl;
+        }
     }
     cin.ignore(numeric_limits<std::streamsize>::max(), '\n');
 
@@ -87,9 +100,16 @@ int main() {
     
     while(opcao!=1 && opcao!=2){
         cin >> opcao;
-        if(opcao!=1 && opcao!=2){
-            cout << endl << "Opcao invalida, tente novamente" << endl;
+        if(cin.fail()){
+            cin.clear();
+            cin.ignore(200, '\n');
+            opcao = 0;
+            cout << "Opcao invalida, selecione:" << endl << "1 -> CARRO" << endl << "2 -> MOTO" << endl; 
+            continue;
         }
+        else{
+            cout << "OPCAO INVALIDA TENTE NOVAMENTE" << endl;
+        }   
     }
     
     system ("cls");
@@ -106,11 +126,22 @@ int main() {
 
                 int escolhaCliente;
                 cout << endl << "DIGITE O NUMERO DA MOTO DESEJADA: ";
+                
                 cin >> escolhaCliente;
+                if(cin.fail()){
+                    cin.clear();
+                    cin.ignore(200, '\n');
+                    opcao = 0;
+                    cout << "Digite um numero valido" << endl; 
+                    continue;
+                } 
 
                 if (escolhaCliente < 1 || escolhaCliente > (int)lista.size()) {
                     system("cls");
                     throw std::runtime_error("OPCAO INVALIDA. TENTE NOVAMENTE.");
+                }
+                else{
+                    cout << "OPCAO INVALIDA TENTE NOVAMENTE" << endl;
                 }
 
                 if (lista[escolhaCliente - 1]->isDisponivel()) {
@@ -151,11 +182,21 @@ int main() {
                 int escolhaCliente;
                 cout << endl << "DIGITE O NUMERO DO CARRO DESEJADO: ";
                 cin >> escolhaCliente;
+                if(cin.fail()){
+                    cin.clear();
+                    cin.ignore(200, '\n');
+                    opcao = 0;
+                    cout << "Digite um numero valido" << endl; 
+                    continue;
+                }
                 system("cls");
                 if (escolhaCliente < 1 || escolhaCliente > (int)lista.size()) {
                     //system("cls");
                     throw runtime_error("OPCAO INVALIDA. TENTE NOVAMENTE.");
                     
+                }
+                else{
+                    cout << "OPCAO INVALIDA TENTE NOVAMENTE" << endl;
                 }
 
                 if (lista[escolhaCliente - 1]->isDisponivel()) {

@@ -14,7 +14,7 @@ Contrato::Contrato(const Cliente &c, Veiculo* v) : cliente(c), veiculo(v), diasA
 
 void Contrato::preencherFormulario(){
     cout << endl << "--------FORMULARIO DE LOCACAO LOCPROG--------" << endl << endl;
-    cout << "Data de retirada(DD/MM/AAAA): ";
+    //cout << "Data de retirada(DD/MM/AAAA): ";
     //getline(cin, dataRetirada);
     dataRetirada = dataSync::getDataAtual();
 
@@ -56,11 +56,11 @@ void Contrato::gerarArquivoTxt(const string& gerarContrato) const{
     std::time_t t = std::time(nullptr);
     std::tm* now = std::localtime(&t);
 
-    char timestamp[20];
-    std::snprintf(timestamp, sizeof(timestamp), "%02d-%02d-%04d_%02d-%02d-%02d",
+    char dataNomeArquivo[20];
+    std::snprintf(dataNomeArquivo, sizeof(dataNomeArquivo), "%02d-%02d-%04d_%02d-%02d-%02d",
     now->tm_mday, now->tm_mon + 1, now->tm_year + 1900, now->tm_hour, now->tm_min, now->tm_sec);
 
-    string nomeArquivo = cliente.getCpf() + "_" + timestamp + ".txt";
+    string nomeArquivo = cliente.getCpf() + "_" + dataNomeArquivo + ".txt";
     
     string caminhoArq = pastaCliente + "/" + nomeArquivo;
 
@@ -84,7 +84,7 @@ void Contrato::gerarArquivoTxt(const string& gerarContrato) const{
 
     contratoTxt << "DATA DE RETIRADA.: " << dataRetirada << endl;
     contratoTxt << "DIAS DE LOCACAO..: " << diasAluguel << endl;
-    contratoTxt << "Data de devolucao: " << dataSync::somarDias(dataSync::getDataAtual(), diasAluguel) << endl;
+    contratoTxt << "Data de devolucao: " << dataSync::somarDias(dataSync::setDataAluguel(), diasAluguel) << endl;
     contratoTxt << "SEGURO...........: " ; if(seguro){contratoTxt << "SIM";} else{contratoTxt << "NAO";} contratoTxt << endl;
     contratoTxt << "VALOR FINAL......: R$ " << valorFinal << endl;
 
