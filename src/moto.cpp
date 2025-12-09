@@ -12,14 +12,11 @@ Moto::Moto() : Veiculo() {}
 Moto::Moto(string tipo, string marca, string model, string cor, float diaria, bool disponivel)
     : Veiculo("Moto", marca, model, cor, diaria, disponivel) {}
 
-// ================================
-// LEITURA DO ARQUIVO DE MOTOS ✅
-// ================================
 vector<Moto *> Moto::lerLista(const string &caminho)
 {
     vector<Moto *> lista;
 
-    ifstream arquivoTxt(caminho); // ✅ AGORA USA O CAMINHO CORRETO
+    ifstream arquivoTxt(caminho);
 
     if (!arquivoTxt.is_open())
     {
@@ -40,9 +37,6 @@ vector<Moto *> Moto::lerLista(const string &caminho)
     return lista;
 }
 
-// ================================
-// IMPRESSÃO DA LISTA ✅
-// ================================
 void Moto::imprimirLista(const vector<Moto *> &lista)
 {
     cout << "***** Lista de Motos *****" << endl;
@@ -59,9 +53,6 @@ void Moto::imprimirLista(const vector<Moto *> &lista)
     }
 }
 
-// ================================
-// INFORMAÇÕES COMPLETAS ✅
-// ================================
 void Moto::infoVeiculos() const
 {
     cout << "***** Informacoes da Moto *****" << endl;
