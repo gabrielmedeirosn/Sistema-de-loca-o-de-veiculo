@@ -1,53 +1,86 @@
 #include "carro.h"
+#include <fstream>
+#include <iostream>
+#include <stdexcept>
+
 using namespace std;
-Carro::Carro() : Veiculo() {
 
-}
+Carro::Carro() : Veiculo() {}
 
-Carro::Carro(string tipo, string marca, string model, string cor, float diaria,  bool disponivel) : Veiculo("Carro", marca, model, cor, diaria, disponivel){
-}
+Carro::Carro(string tipo, string marca, string model, string cor, float diaria, bool disponivel)
+    : Veiculo("Carro", marca, model, cor, diaria, disponivel) {}
 
-vector<Carro*> Carro::lerLista(const string &carrosTxt){  //carrosTxt se refere ao nome do arquivo que vai ser aberto
+// ================================
+// LEITURA DO ARQUIVO DE CARROS ✅
+// ================================
+vector<Carro *> Carro::lerLista(const string &caminho)
+{                          // caminho = "data/carros.txt"
+    vector<Carro *> lista; // lista é o vetor que armazena os carros
 
-    vector<Carro*> lista; //lista eh o vetor que armazena os carros
+    ifstream arquivoTxt(caminho); // ✅ usa exatamente o caminho recebido
 
-    ifstream arquivoTxt("../data/" + carrosTxt); //entrada de dados, criando obejto arquivoTxt responsavel por abrir, ler e fechar(como um scanner)
-
-    try{
-        if(!arquivoTxt.is_open()){
-            throw runtime_error("Erro ao abrir arquivo: " + carrosTxt);
-        }
-    
+    if (!arquivoTxt.is_open())
+    {
+        throw runtime_error("Erro ao abrir arquivo: " + caminho);
+    }
 
     string marcaTxt, modeloTxt, corTxt;
-    bool isDisponivel;
+    bool isDisponivelTxt;
     float diariaTxt;
 
-    while(arquivoTxt >> marcaTxt >> modeloTxt >> corTxt >> diariaTxt >> isDisponivel){
-        lista.push_back(new Carro ("Carro", marcaTxt, modeloTxt, corTxt, diariaTxt, isDisponivel));
+    while (arquivoTxt >> marcaTxt >> modeloTxt >> corTxt >> diariaTxt >> isDisponivelTxt)
+    {
+        lista.push_back(
+            new Carro("Carro", marcaTxt, modeloTxt, corTxt, diariaTxt, isDisponivelTxt));
     }
 
     arquivoTxt.close();
-}
-    catch (const exception& e) {
-        cout << "Erro: " << e.what() << endl;
-    }
-    
     return lista;
-    
 }
 
-void Carro::imprimirLista(const vector<Carro*> &lista){
-    cout << "*****Lista de Carros*****" << endl;;
-    for(size_t i=0; i<lista.size(); i++){
-        cout << i+1 << ". " << lista[i]-> getMarca() << ", "<< lista[i]-> getModel() << ", "<< lista[i]-> getCor() 
-            << ", "<< lista[i]-> getDiaria() << ", "
-            << (lista[i]-> isDisponivel() ? "Disponivel" : "Indisponivel")
-            << endl;
+// ================================
+// IMPRESSÃO DA LISTA ✅
+// ================================
+void Carro::imprimirLista(const vector<Carro *> &lista)
+{
+    cout << "***** Lista de Carros *****" << endl;
+    for (size_t i = 0; i < lista.size(); i++)
+    {
+        cout << i + 1 << ". "
+             << lista[i]->getMarca() << ", "
+             << lista[i]->getModel() << ", "
+             << lista[i]->getCor() << ", "
+             << lista[i]->getDiaria() << ", "
+             << (lista[i]->isDisponivel() ? "Disponivel" : "Indisponivel")
+             << endl;
     }
 }
 
-void Carro::infoVeiculos() const{
-    cout << "*****Informacoes do Carro*****" << endl;
+// ================================
+// INFORMAÇÕES COMPLETAS ✅
+// ================================
+void Carro::infoVeiculos() const
+{
+    cout << "***** Informacoes do Carro *****" << endl;
     Veiculo::infoVeiculos();
+}
+
+void Carro::salvarLista(const vector<Carro *> &lista, const string &caminho)
+{
+    ofstream arq(caminho);
+    if (!arq.is_open())
+    {
+        throw runtime_error("Erro ao salvar arquivo de carros: " + caminho);
+    }
+
+    for (const auto &c : lista)
+    {
+        arq << c->getMarca() << ' '
+            << c->getModel() << ' '
+            << c->getCor() << ' '
+            << c->getDiaria() << ' '
+            << (c->isDisponivel() ? 1 : 0) << '\n';
+    }
+
+    arq << "/0\n";
 }
