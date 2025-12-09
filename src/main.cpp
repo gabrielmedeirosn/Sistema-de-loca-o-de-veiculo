@@ -140,9 +140,7 @@ int main() {
                     system("cls");
                     throw std::runtime_error("OPCAO INVALIDA. TENTE NOVAMENTE.");
                 }
-                else{
-                    cout << "OPCAO INVALIDA TENTE NOVAMENTE" << endl;
-                }
+
 
                 if (lista[escolhaCliente - 1]->isDisponivel()) {
                     cout << lista[escolhaCliente - 1]->getMarca() << " "<< lista[escolhaCliente - 1]->getModel() << endl;
@@ -194,9 +192,6 @@ int main() {
                     //system("cls");
                     throw runtime_error("OPCAO INVALIDA. TENTE NOVAMENTE.");
                     
-                }
-                else{
-                    cout << "OPCAO INVALIDA TENTE NOVAMENTE" << endl;
                 }
 
                 if (lista[escolhaCliente - 1]->isDisponivel()) {
