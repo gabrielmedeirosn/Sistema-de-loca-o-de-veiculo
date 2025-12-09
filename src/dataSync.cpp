@@ -40,10 +40,11 @@ std::string dataSync::setDataAluguel(){
     char opc;
     std::cout << "Deseja usar a data de hoje (" << getDataAtual() << ")? [s/n]: ";
     std::cin >> opc;
+    //std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     if (opc == 's' || opc == 'S')
         return getDataAtual();
-
+        
     return dataUsuario();
 }
 

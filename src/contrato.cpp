@@ -10,13 +10,15 @@
 
 Contrato::Contrato(const Cliente &c, Veiculo* v) : cliente(c), veiculo(v), diasAluguel(0), seguro(false), valorFinal(0.0) {}
 
-
+std::string Contrato::getDataRetirada() const{
+    return dataRetirada;
+}
 
 void Contrato::preencherFormulario(){
     cout << endl << "--------FORMULARIO DE LOCACAO LOCPROG--------" << endl << endl;
     //cout << "Data de retirada(DD/MM/AAAA): ";
     //getline(cin, dataRetirada);
-    dataRetirada = dataSync::getDataAtual();
+    dataRetirada = dataSync::setDataAluguel();
 
     cout << endl << "Quantos dias de aluguel: ";
     cin >> diasAluguel;
@@ -41,6 +43,8 @@ void Contrato::calcularValorFinal(){
 
 }
 
+
+
 void Contrato::gerarArquivoTxt(const string& gerarContrato) const{
 
     string pastaBase = "Contratos";
@@ -64,7 +68,9 @@ void Contrato::gerarArquivoTxt(const string& gerarContrato) const{
     
     string caminhoArq = pastaCliente + "/" + nomeArquivo;
 
-    
+    std::string dataDevolucao = dataSync::somarDias(dataRetirada, diasAluguel);
+
+    listaAlugados::veiculosAlugados(veiculo, dataRetirada, dataDevolucao);
 
     ofstream contratoTxt (caminhoArq);
     if(!contratoTxt.is_open()){
@@ -84,7 +90,7 @@ void Contrato::gerarArquivoTxt(const string& gerarContrato) const{
 
     contratoTxt << "DATA DE RETIRADA.: " << dataRetirada << endl;
     contratoTxt << "DIAS DE LOCACAO..: " << diasAluguel << endl;
-    contratoTxt << "Data de devolucao: " << dataSync::somarDias(dataSync::setDataAluguel(), diasAluguel) << endl;
+    contratoTxt << "DATA DE DEVOLUCAO: " << dataDevolucao << endl;
     contratoTxt << "SEGURO...........: " ; if(seguro){contratoTxt << "SIM";} else{contratoTxt << "NAO";} contratoTxt << endl;
     contratoTxt << "VALOR FINAL......: R$ " << valorFinal << endl;
 
