@@ -25,8 +25,11 @@ class Carro {
 
 - Carro()
 - Carro(string tipo, string marca, string model, string cor, float diaria, bool disponivel)
-- lerLista(nomeArquivo: string): vector<Carro\*> <<static>>
+
+- lerLista(caminho: string): vector<Carro\*> <<static>>
 - imprimirLista(lista: vector<Carro\*>): void <<static>>
+- salvarLista(lista: vector<Carro\*>, caminho: string): void <<static>>
+
 - infoVeiculos(): void
   }
 
@@ -34,8 +37,11 @@ class Moto {
 
 - Moto()
 - Moto(string tipo, string marca, string model, string cor, float diaria, bool disponivel)
-- lerLista(nomeArquivo: string): vector<Moto\*>
-- imprimirLista(lista: vector<Moto\*>): void
+
+- lerLista(caminho: string): vector<Moto\*> <<static>>
+- imprimirLista(lista: vector<Moto\*>): void <<static>>
+- salvarLista(lista: vector<Moto\*>, caminho: string): void <<static>>
+
 - infoVeiculos(): void <<override>>
   }
 
@@ -49,7 +55,6 @@ class Cliente {
 * Cliente(const string& nome, const string& cpf)
 * getNome(): string
 * getCpf(): string
-* setVeiculoEscolhido(): void
 * setVeiculoEscolhido(Veiculo\* v): void
 * getVeiculoEscolhido(): Veiculo\*
 * infoCliente(): void <<const>>
