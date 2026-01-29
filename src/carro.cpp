@@ -10,14 +10,11 @@ Carro::Carro() : Veiculo() {}
 Carro::Carro(string tipo, string marca, string model, string cor, float diaria, bool disponivel)
     : Veiculo("Carro", marca, model, cor, diaria, disponivel) {}
 
-// ================================
-// LEITURA DO ARQUIVO DE CARROS ✅
-// ================================
 vector<Carro *> Carro::lerLista(const string &caminho)
-{                          // caminho = "data/carros.txt"
-    vector<Carro *> lista; // lista é o vetor que armazena os carros
+{ // caminho = "data/carros.txt"
+    vector<Carro *> lista;
 
-    ifstream arquivoTxt(caminho); // ✅ usa exatamente o caminho recebido
+    ifstream arquivoTxt(caminho);
 
     if (!arquivoTxt.is_open())
     {
@@ -38,9 +35,6 @@ vector<Carro *> Carro::lerLista(const string &caminho)
     return lista;
 }
 
-// ================================
-// IMPRESSÃO DA LISTA ✅
-// ================================
 void Carro::imprimirLista(const vector<Carro *> &lista)
 {
     cout << "***** Lista de Carros *****" << endl;
@@ -56,9 +50,6 @@ void Carro::imprimirLista(const vector<Carro *> &lista)
     }
 }
 
-// ================================
-// INFORMAÇÕES COMPLETAS ✅
-// ================================
 void Carro::infoVeiculos() const
 {
     cout << "***** Informacoes do Carro *****" << endl;

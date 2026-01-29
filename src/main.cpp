@@ -15,6 +15,7 @@ using namespace std;
 bool cpfJaCadastrado(const string &cpf);
 
 const string ARQ_CLIENTES = "data/clientes.txt";
+const string ARQ_ADMINS = "data/administradores.txt";
 
 void salvarClienteEmArquivo(const string &nome, const string &cpf, int tema)
 {
@@ -26,6 +27,76 @@ void salvarClienteEmArquivo(const string &nome, const string &cpf, int tema)
 
     // formato: CPF;NOME;TEMA
     arq << cpf << ';' << nome << ';' << tema << '\n';
+}
+
+void listarClientes()
+{
+    ifstream arq(ARQ_CLIENTES);
+    if (!arq.is_open())
+    {
+        throw runtime_error("Nao foi possivel abrir o arquivo de clientes.");
+    }
+
+    system("cls");
+    cout << "=== LISTA DE CLIENTES CADASTRADOS ===" << endl;
+
+    string linha;
+    int contador = 0;
+
+    while (getline(arq, linha))
+    {
+        if (linha.empty())
+            continue;
+
+        size_t sep1 = linha.find(';');
+        if (sep1 == string::npos)
+            continue;
+
+        size_t sep2 = linha.find(';', sep1 + 1);
+
+        string cpf = linha.substr(0, sep1);
+        string nome;
+        int tema = 1;
+
+        if (sep2 == string::npos)
+        {
+            // formato : CPF;NOME
+            nome = linha.substr(sep1 + 1);
+        }
+        else
+        {
+            // formato : CPF;NOME;TEMA
+            nome = linha.substr(sep1 + 1, sep2 - sep1 - 1);
+            if (sep2 + 1 < linha.size())
+            {
+                try
+                {
+                    tema = stoi(linha.substr(sep2 + 1));
+                }
+                catch (...)
+                {
+                    tema = 1;
+                }
+            }
+        }
+
+        contador++;
+        cout << contador << ") "
+             << "Nome: " << nome
+             << " | CPF: " << cpf
+             << " | Tema: " << (tema == 1 ? "Escuro" : "Claro")
+             << endl;
+    }
+
+    if (contador == 0)
+    {
+        cout << "Nenhum cliente cadastrado." << endl;
+    }
+
+    cout << endl
+         << "Pressione ENTER para voltar...";
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cin.get();
 }
 
 string justNumeros(const string &cpf)
@@ -79,9 +150,8 @@ Cliente cadastrarCliente()
     getline(cin, tempNome);
     nome = maiusculo(tempNome);
 
-    // =======================
-    // ESCOLHA DE TEMA AQUI ✅
-    // =======================
+    // ESCOLHA DE TEMA
+
     int tema = 0;
     while (tema != 1 && tema != 2)
     {
@@ -119,9 +189,8 @@ Cliente cadastrarCliente()
     // limpar \n depois do cin >> tema
     cin.ignore(numeric_limits<std::streamsize>::max(), '\n');
 
-    // =======================
     // CPF + VERIFICAÇÃO DUPLO
-    // =======================
+
     while (true)
     {
         cout << endl
@@ -177,12 +246,12 @@ bool existeClienteNoArquivo(const string &nome, const string &cpf)
 
         if (sep2 == string::npos)
         {
-            // formato antigo: CPF;NOME
+            // formato : CPF;NOME
             nomeArquivo = linha.substr(sep1 + 1);
         }
         else
         {
-            // formato novo: CPF;NOME;TEMA
+            // formato : CPF;NOME;TEMA
             nomeArquivo = linha.substr(sep1 + 1, sep2 - sep1 - 1);
         }
 
@@ -220,12 +289,12 @@ int obterTemaCliente(const string &nome, const string &cpf)
 
         if (sep2 == string::npos)
         {
-            // formato antigo: CPF;NOME
+            // formato : CPF;NOME
             nomeArquivo = linha.substr(sep1 + 1);
         }
         else
         {
-            // formato novo: CPF;NOME;TEMA
+            // formato : CPF;NOME;TEMA
             nomeArquivo = linha.substr(sep1 + 1, sep2 - sep1 - 1);
             if (sep2 + 1 < linha.size())
             {
@@ -247,6 +316,361 @@ int obterTemaCliente(const string &nome, const string &cpf)
     }
 
     return 1; // se não achar, usa tema escuro como padrão
+}
+
+bool existeAdminNoArquivo(const string &nome, const string &cpf)
+{
+    ifstream arq(ARQ_ADMINS);
+    if (!arq.is_open())
+    {
+        throw runtime_error("Nao foi possivel abrir o arquivo de administradores.");
+    }
+
+    string linha;
+    while (getline(arq, linha))
+    {
+        if (linha.empty())
+            continue;
+
+        size_t sep1 = linha.find(';');
+        if (sep1 == string::npos)
+            continue;
+
+        size_t sep2 = linha.find(';', sep1 + 1);
+
+        string cpfArquivo = linha.substr(0, sep1);
+        string nomeArquivo;
+
+        if (sep2 == string::npos)
+        {
+            // formato: CPF;NOME
+            nomeArquivo = linha.substr(sep1 + 1);
+        }
+        else
+        {
+            // formato: CPF;NOME;ALGUMA_COISA (tema, nivel, etc)
+            nomeArquivo = linha.substr(sep1 + 1, sep2 - sep1 - 1);
+        }
+
+        if (cpfArquivo == cpf && nomeArquivo == nome)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool autenticarAdministrador()
+{
+    while (true)
+    {
+        string tempNome, nome, cpf;
+
+        cout << "LOGIN DE ADMINISTRADOR" << endl;
+        cout << "DIGITE SEU NOME: ";
+        getline(cin, tempNome);
+        nome = maiusculo(tempNome);
+
+        cout << "DIGITE SEU CPF: ";
+        cpf = ConfirmaCpf();
+
+        // limpa o '\n' deixado pelo ConfirmaCpf (usa >>)
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        try
+        {
+            if (existeAdminNoArquivo(nome, cpf))
+            {
+                system("cls");
+                cout << "Login de administrador realizado com sucesso!" << endl;
+                return true;
+            }
+            else
+            {
+                cout << "Administrador nao encontrado com esse nome e CPF." << endl;
+                cout << "Deseja tentar novamente? (S/N): ";
+                string resp;
+                getline(cin, resp);
+
+                if (!resp.empty() && (resp[0] == 'n' || resp[0] == 'N'))
+                {
+                    system("cls");
+                    cout << "Retornando ao inicio do sistema..." << endl;
+                    return false;
+                }
+
+                system("cls");
+            }
+        }
+        catch (const exception &e)
+        {
+            cout << "Erro: " << e.what() << endl;
+            cout << "Nao foi possivel verificar o administrador. Vamos tentar de novo." << endl;
+        }
+    }
+}
+
+void paginaCarrosAdmin()
+{
+    vector<Carro *> lista;
+
+    try
+    {
+        lista = Carro::lerLista("data/carros.txt");
+    }
+    catch (const exception &e)
+    {
+        cout << "Erro: " << e.what() << endl;
+        cout << "Pressione ENTER para voltar...";
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cin.get();
+        return;
+    }
+
+    if (lista.empty())
+    {
+        cout << "Nenhum carro encontrado." << endl;
+        cout << "Pressione ENTER para voltar...";
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cin.get();
+        return;
+    }
+
+    int opc = -1;
+    while (true)
+    {
+        system("cls");
+        cout << "=== LISTA DE CARROS (ADMIN) ===" << endl
+             << endl;
+
+        Carro::imprimirLista(lista);
+
+        cout << endl;
+        cout << "Digite o numero do carro para alternar disponibilidade." << endl;
+        cout << "0 - Voltar ao menu do administrador" << endl;
+        cout << "Opcao: ";
+        cin >> opc;
+
+        if (cin.fail())
+        {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Entrada invalida. Pressione ENTER para tentar novamente...";
+            cin.get();
+            continue;
+        }
+
+        if (opc == 0)
+        {
+            break; // volta ao menuAdministrador
+        }
+
+        if (opc < 1 || opc > (int)lista.size())
+        {
+            cout << "Indice invalido. Pressione ENTER para tentar novamente...";
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cin.get();
+            continue;
+        }
+
+        // indice válido
+        int idx = opc - 1;
+        bool disponivelAtual = lista[idx]->isDisponivel();
+        lista[idx]->setDisponivel(!disponivelAtual);
+
+        try
+        {
+            Carro::salvarLista(lista, "data/carros.txt");
+            cout << "Disponibilidade do carro " << opc
+                 << " alterada para "
+                 << (lista[idx]->isDisponivel() ? "Disponivel" : "Indisponivel")
+                 << "." << endl;
+        }
+        catch (const exception &e)
+        {
+            cout << "Erro ao salvar arquivo de carros: " << e.what() << endl;
+        }
+
+        cout << "Pressione ENTER para continuar...";
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cin.get();
+    }
+}
+
+void paginaMotosAdmin()
+{
+    vector<Moto *> lista;
+
+    try
+    {
+        lista = Moto::lerLista("data/motos.txt");
+    }
+    catch (const exception &e)
+    {
+        cout << "Erro: " << e.what() << endl;
+        cout << "Pressione ENTER para voltar...";
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cin.get();
+        return;
+    }
+
+    if (lista.empty())
+    {
+        cout << "Nenhuma moto encontrada." << endl;
+        cout << "Pressione ENTER para voltar...";
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cin.get();
+        return;
+    }
+
+    int opc = -1;
+    while (true)
+    {
+        system("cls");
+        cout << "=== LISTA DE MOTOS (ADMIN) ===" << endl
+             << endl;
+
+        Moto::imprimirLista(lista);
+
+        cout << endl;
+        cout << "Digite o numero da moto para alternar disponibilidade." << endl;
+        cout << "0 - Voltar ao menu do administrador" << endl;
+        cout << "Opcao: ";
+        cin >> opc;
+
+        if (cin.fail())
+        {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Entrada invalida. Pressione ENTER para tentar novamente...";
+            cin.get();
+            continue;
+        }
+
+        if (opc == 0)
+        {
+            break; // volta ao menuAdministrador
+        }
+
+        if (opc < 1 || opc > (int)lista.size())
+        {
+            cout << "Indice invalido. Pressione ENTER para tentar novamente...";
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cin.get();
+            continue;
+        }
+
+        int idx = opc - 1;
+        bool disponivelAtual = lista[idx]->isDisponivel();
+        lista[idx]->setDisponivel(!disponivelAtual);
+
+        try
+        {
+            Moto::salvarLista(lista, "data/motos.txt");
+            cout << "Disponibilidade da moto " << opc
+                 << " alterada para "
+                 << (lista[idx]->isDisponivel() ? "Disponivel" : "Indisponivel")
+                 << "." << endl;
+        }
+        catch (const exception &e)
+        {
+            cout << "Erro ao salvar arquivo de motos: " << e.what() << endl;
+        }
+
+        cout << "Pressione ENTER para continuar...";
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cin.get();
+    }
+}
+
+void menuClientesAdmin()
+{
+    int opc = -1;
+    while (opc != 0)
+    {
+        system("cls");
+        cout << "=== PAGINA DE CLIENTES (ADMIN) ===" << endl;
+        cout << "1 - Visualizar cadastros" << endl;
+        cout << "0 - Voltar ao menu anterior" << endl;
+        cout << "Opcao: ";
+        cin >> opc;
+
+        if (cin.fail())
+        {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            opc = -1;
+            cout << "Opcao invalida. Pressione ENTER para tentar novamente...";
+            cin.get();
+            continue;
+        }
+
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        switch (opc)
+        {
+        case 1:
+            listarClientes();
+            break;
+        case 0:
+            // volta
+            break;
+        default:
+            cout << "Opcao invalida. Pressione ENTER para tentar novamente...";
+            cin.get();
+            break;
+        }
+    }
+}
+
+void menuAdministrador()
+{
+    int opc = -1;
+
+    while (opc != 0)
+    {
+        system("cls");
+        cout << "=== MENU ADMINISTRADOR ===" << endl;
+        cout << "1 - Pagina Clientes" << endl;
+        cout << "2 - Pagina Carros" << endl;
+        cout << "3 - Pagina Motos" << endl;
+        cout << "0 - Sair do modo administrador" << endl;
+        cout << "Opcao: ";
+        cin >> opc;
+
+        if (cin.fail())
+        {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            opc = -1;
+            cout << "Opcao invalida. Pressione ENTER para tentar novamente...";
+            cin.get();
+            continue;
+        }
+
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        switch (opc)
+        {
+        case 1:
+            menuClientesAdmin();
+            break;
+        case 2:
+            paginaCarrosAdmin();
+            break;
+        case 3:
+            paginaMotosAdmin();
+            break;
+        case 0:
+            system("cls");
+            cout << "Saindo do modo administrador..." << endl;
+            break;
+        default:
+            cout << "Opcao invalida. Pressione ENTER para tentar novamente...";
+            cin.get();
+            break;
+        }
+    }
 }
 
 Cliente autenticarCliente()
@@ -339,8 +763,48 @@ bool cpfJaCadastrado(const string &cpf)
 
 int main()
 {
-    // cout << "Diretorio atual: " << std::filesystem::current_path() << endl;
     system("color 07"); // neutro padrão
+    int tipoUsuario = 0;
+    while (tipoUsuario != 1 && tipoUsuario != 2)
+    {
+        cout << "Selecione o tipo de usuario:" << endl;
+        cout << "1 - Cliente" << endl;
+        cout << "2 - Administrador" << endl;
+        cout << "Opcao: ";
+        cin >> tipoUsuario;
+
+        if (cin.fail())
+        {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            tipoUsuario = 0;
+            system("cls");
+            cout << "Opcao invalida. Tente novamente." << endl;
+        }
+        else if (tipoUsuario != 1 && tipoUsuario != 2)
+        {
+            system("cls");
+            cout << "Opcao invalida. Tente novamente." << endl;
+        }
+    }
+
+    // limpar '\n' depois do cin >> tipoUsuario
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    // FLUXO DE ADMINISTRADOR
+
+    if (tipoUsuario == 2)
+    {
+        bool ok = autenticarAdministrador();
+        if (!ok)
+        {
+            cout << "Encerrando o sistema..." << endl;
+            return 0;
+        }
+
+        menuAdministrador();
+        return 0;
+    }
 
     // Pergunta se já tem cadastro
     char possuiCadastro = 0;
